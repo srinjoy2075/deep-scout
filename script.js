@@ -1,25 +1,14 @@
-/* =========================================================================
-   DeepScout — script.js
-   Vanilla JS only. Talks to the existing FastAPI backend at
-   POST http://127.0.0.1:8000/research and renders whatever it returns.
-   No research data is ever hardcoded here — everything shown in the
-   results view is derived from the API response.
-   ========================================================================= */
 
 (() => {
   "use strict";
 
-  /* ----------------------------- Config -------------------------------- */
   const CONFIG = {
-    API_URL: "http://127.0.0.1:8000/research",
-    // Stage timings for the depth gauge while we wait on the single
-    // request/response call (the backend has no streaming progress, so
-    // this is a paced simulation that never claims completion early).
+    API_URL: "https://deep-scout-1.onrender.com",
+
     STAGE_DELAYS_MS: [600, 3200, 6200, 9200],
     TOAST_DURATION_MS: 4200,
   };
 
-  /* ---------------------------- DOM refs -------------------------------- */
   const dom = {
     form: document.getElementById("research-form"),
     input: document.getElementById("topic-input"),
@@ -52,14 +41,14 @@
     toastStack: document.getElementById("toast-stack"),
   };
 
-  /* State that persists across a single research run */
+
   let state = {
     topic: "",
     report: "",
     stageTimers: [],
   };
 
-  /* ============================ View states ============================= */
+
 
   function showView(view) {
     // view: 'hero' | 'loading' | 'error' | 'results'
@@ -69,7 +58,6 @@
     dom.results.hidden = view !== "results";
   }
 
-  /* ============================== Toasts ================================= */
 
   function toast(message, type = "info") {
     const el = document.createElement("div");
@@ -84,7 +72,6 @@
     }, CONFIG.TOAST_DURATION_MS);
   }
 
-  /* ============================ Depth gauge ============================= */
 
   function resetGauge() {
     dom.stages.forEach((stage) => {
@@ -125,7 +112,7 @@
     });
   }
 
-  /* ============================== Utilities =============================== */
+ 
 
   function escapeHtml(str) {
     const div = document.createElement("div");
@@ -133,10 +120,7 @@
     return div.innerHTML;
   }
 
-  // Small, self-contained markdown-ish renderer for report/critic text.
-  // Handles: #/##/### headings, **bold**, *italic*, - bullet lists,
-  // bare/markdown links, and paragraph breaks. Deliberately minimal —
-  // this is prose from an LLM, not a full CommonMark document.
+
   function renderMarkdown(raw) {
     if (!raw) return "";
     const lines = raw.split("\n");
@@ -205,9 +189,7 @@
     return html;
   }
 
-  // Splits a report string into named sections based on common heading
-  // styles the writer prompt asks for (Introduction / Key Findings /
-  // Conclusion / Sources). Falls back gracefully if headings vary.
+
   function parseReportSections(report) {
     const sectionNames = ["Introduction", "Key Findings", "Conclusion", "Sources"];
     const pattern = new RegExp(
@@ -270,7 +252,7 @@
     return match ? match[1].trim() : "";
   }
 
-  /* ============================== Rendering ============================== */
+  
 
   function renderResults(data) {
     const { topic, search_results, scraped_content, report, feedback } = data;
@@ -301,8 +283,7 @@
       dom.findingsContent.innerHTML = `<p class="empty-note">No distinct findings section was detected in the report.</p>`;
     }
 
-    // Sources: prefer a dedicated "Sources" section, fall back to scanning
-    // the whole report, then the raw search results.
+
     let urls = extractUrls(sections.sources);
     if (!urls.length) urls = extractUrls(report);
     if (!urls.length) urls = extractUrls(search_results);
@@ -335,7 +316,6 @@
     dom.trailScrape.textContent = scraped_content || "No scraped content returned.";
   }
 
-  /* =============================== Actions ================================ */
 
   function copyReport() {
     if (!state.report) {
@@ -380,7 +360,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  /* ============================== API call ================================ */
+
 
   async function runResearch(topic) {
     state.topic = topic;
@@ -435,7 +415,6 @@
     }
   }
 
-  /* =============================== Events ================================= */
 
   dom.form.addEventListener("submit", (e) => {
     e.preventDefault();
