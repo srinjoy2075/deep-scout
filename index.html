@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepScout — AI Research Assistant</title>
+  <meta name="description" content="DeepScout charts a topic's depths — searching, reading, writing and self-critiquing a research report in one pass." />
+
+  <!-- Fonts: Space Grotesk (display), Inter (body), JetBrains Mono (data / readouts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient background: depth gradient + drifting particulate layer -->
+  <div class="ocean-bg" aria-hidden="true">
+    <div class="ocean-bg__glow ocean-bg__glow--cyan"></div>
+    <div class="ocean-bg__glow ocean-bg__glow--amber"></div>
+    <div class="ocean-bg__grain"></div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <span class="brand__ping"></span>
+          <span class="brand__dot"></span>
+        </span>
+        <span class="brand__name">DeepScout</span>
+      </div>
+      <span class="brand__tagline">Research, charted to the bottom</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <p class="hero__eyebrow">AI Research Assistant</p>
+      <h1 class="hero__title">
+        Drop a topic in.<br />
+        <span class="hero__title-accent">Surface the whole picture.</span>
+      </h1>
+      <p class="hero__subtitle">
+        DeepScout sends a search agent out, hands the best find to a reader agent,
+        drafts a structured report, then has a critic tear it apart — so you don't have to.
+      </p>
+
+      <form class="search-console" id="research-form" autocomplete="off">
+        <label for="topic-input" class="sr-only">Research topic</label>
+        <div class="search-console__field">
+          <svg class="search-console__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M20 20L16.5 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input
+            type="text"
+            id="topic-input"
+            name="topic"
+            placeholder="e.g. The economics of deep-sea mining"
+            maxlength="200"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-scout" id="submit-btn">
+          <span class="btn-scout__label">Start Research</span>
+          <span class="btn-scout__ping" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="hero__hints">
+        <span>Try:</span>
+        <button type="button" class="hint-chip" data-topic="The future of quantum computing">Quantum computing</button>
+        <button type="button" class="hint-chip" data-topic="Impact of AI on the job market">AI &amp; jobs</button>
+        <button type="button" class="hint-chip" data-topic="Renewable energy storage breakthroughs">Energy storage</button>
+      </div>
+    </section>
+
+    <!-- ============ DEPTH GAUGE / LOADING STATE ============ -->
+    <section class="depth-console" id="depth-console" hidden>
+      <div class="depth-console__inner">
+        <div class="sonar" aria-hidden="true">
+          <div class="sonar__ring sonar__ring--1"></div>
+          <div class="sonar__ring sonar__ring--2"></div>
+          <div class="sonar__ring sonar__ring--3"></div>
+          <div class="sonar__sweep"></div>
+          <div class="sonar__core"></div>
+        </div>
+
+        <div class="depth-console__status">
+          <p class="depth-console__label">Charting <span id="depth-topic">—</span></p>
+          <ol class="depth-gauge" id="depth-gauge">
+            <li class="depth-gauge__stage" data-stage="search">
+              <span class="depth-gauge__index">01</span>
+              <span class="depth-gauge__text">
+                <strong>Search agent</strong>
+                <em>Casting for recent, reliable sources</em>
+              </span>
+              <span class="depth-gauge__mark" aria-hidden="true"></span>
+            </li>
+            <li class="depth-gauge__stage" data-stage="scrape">
+              <span class="depth-gauge__index">02</span>
+              <span class="depth-gauge__text">
+                <strong>Reader agent</strong>
+                <em>Pulling deep content from the strongest lead</em>
+              </span>
+              <span class="depth-gauge__mark" aria-hidden="true"></span>
+            </li>
+            <li class="depth-gauge__stage" data-stage="write">
+              <span class="depth-gauge__index">03</span>
+              <span class="depth-gauge__text">
+                <strong>Writer</strong>
+                <em>Drafting the structured report</em>
+              </span>
+              <span class="depth-gauge__mark" aria-hidden="true"></span>
+            </li>
+            <li class="depth-gauge__stage" data-stage="critique">
+              <span class="depth-gauge__index">04</span>
+              <span class="depth-gauge__text">
+                <strong>Critic</strong>
+                <em>Scoring the draft, flagging gaps</em>
+              </span>
+              <span class="depth-gauge__mark" aria-hidden="true"></span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ERROR STATE ============ -->
+    <section class="surface-alert" id="error-state" hidden>
+      <div class="surface-alert__inner">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 9v4M12 16.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M10.29 3.86l-8.18 14.18A1.5 1.5 0 003.4 20.5h17.2a1.5 1.5 0 001.29-2.46L13.71 3.86a1.5 1.5 0 00-2.42 0z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <p class="surface-alert__title">The line went slack.</p>
+          <p class="surface-alert__body" id="error-message">Couldn't reach the research backend. Check that it's running and try again.</p>
+        </div>
+        <button type="button" class="btn-ghost" id="retry-btn">Try again</button>
+      </div>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <section class="results" id="results" hidden>
+
+      <div class="results__header">
+        <p class="results__eyebrow">Findings on</p>
+        <h2 class="results__title" id="results-topic">—</h2>
+        <div class="results__actions">
+          <button type="button" class="btn-ghost" id="copy-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M5 15V5a2 2 0 012-2h10" stroke="currentColor" stroke-width="1.6"/></svg>
+            Copy report
+          </button>
+          <button type="button" class="btn-ghost" id="download-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Download .txt
+          </button>
+          <button type="button" class="btn-ghost" id="new-search-btn">New search</button>
+        </div>
+      </div>
+
+      <div class="results__grid">
+
+        <!-- Report -->
+        <article class="card card--report">
+          <header class="card__header">
+            <span class="card__index">Report</span>
+            <h3>Full write-up</h3>
+          </header>
+          <div class="card__body card__body--prose" id="report-content"></div>
+        </article>
+
+        <div class="results__side">
+          <!-- Key Findings -->
+          <article class="card card--findings">
+            <header class="card__header">
+              <span class="card__index">Signal</span>
+              <h3>Key findings</h3>
+            </header>
+            <div class="card__body" id="findings-content"></div>
+          </article>
+
+          <!-- Sources -->
+          <article class="card card--sources">
+            <header class="card__header">
+              <span class="card__index">Provenance</span>
+              <h3>Sources</h3>
+            </header>
+            <div class="card__body" id="sources-content"></div>
+          </article>
+
+          <!-- Critic feedback -->
+          <article class="card card--critic">
+            <header class="card__header">
+              <span class="card__index">Review</span>
+              <h3>Critic feedback</h3>
+            </header>
+            <div class="card__body" id="critic-content"></div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Research trail: raw search + scrape output, collapsed by default -->
+      <details class="trail">
+        <summary class="trail__summary">
+          <span>Show research trail</span>
+          <span class="trail__hint">raw search results &amp; scraped content</span>
+        </summary>
+        <div class="trail__grid">
+          <div class="trail__block">
+            <h4>Search results</h4>
+            <pre id="trail-search"></pre>
+          </div>
+          <div class="trail__block">
+            <h4>Scraped content</h4>
+            <pre id="trail-scrape"></pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>DeepScout · Search → Read → Write → Critique</p>
+  </footer>
+
+  <!-- Toast notifications -->
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
