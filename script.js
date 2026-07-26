@@ -371,7 +371,7 @@
     runGaugeSequence();
 
     try {
-      const response = await fetch(CONFIG.API_URL, {
+      const response = await fetch(`${CONFIG.API_URL}/research`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic }),
@@ -404,9 +404,9 @@
     } catch (err) {
       clearStageTimers();
       const message =
-        err?.name === "TypeError"
-          ? "Couldn't reach the backend at 127.0.0.1:8000. Is it running?"
-          : err?.message || "Something went wrong while researching that topic.";
+    err?.name === "TypeError"
+        ? "Couldn't reach the DeepScout backend. Please try again later."
+        : err?.message || "Something went wrong.";
       dom.errorMessage.textContent = message;
       showView("error");
       toast(message, "error");
